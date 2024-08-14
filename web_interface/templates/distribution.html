@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Distribution</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Data Distribution Across Nodes</h1>
+        <table>
+            <tr>
+                <th>Node</th>
+                <th>Data Count</th>
+            </tr>
+            <tr>
+                <td>Node 1</td>
+                <td>{{ node1 }}</td>
+            </tr>
+            <tr>
+                <td>Node 2</td>
+                <td>{{ node2 }}</td>
+            </tr>
+            <tr>
+                <td>Node 3</td>
+                <td>{{ node3 }}</td>
+            </tr>
+        </table>
+        <br>
+        <a href="{{ url_for('index') }}"><button>Back to Home</button></a>
+    </div>
+</body>
+</html>
