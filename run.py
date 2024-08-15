@@ -1,14 +1,15 @@
-import time
+from model.data_replication_model import DataReplicationModel
+
 def main():
-    print("Starting simulation...")
-    
-    for step in range(3):
+    # Initialize the model with a specified number of agents
+    num_agents = 6
+    model = DataReplicationModel(num_agents=num_agents)
+
+    # Run the simulation for a certain number of steps
+    for step in range(10):
         print(f"Running step {step + 1}")
-        start_time = time.time()
         model.step()
-        end_time = time.time()
-        print(f"Step {step + 1} completed in {end_time - start_time:.2f} seconds")
-        
+
     print("Simulation complete.")
 
 if __name__ == "__main__":
