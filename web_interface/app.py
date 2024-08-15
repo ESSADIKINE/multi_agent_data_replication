@@ -17,11 +17,16 @@ def index():
 
 @app.route('/run_simulation')
 def run_simulation():
-    # Run the simulation for only 3 steps
+    print("Starting simulation...")
+    
     for step in range(3):
+        print(f"Running step {step + 1}")
         model.step()
 
+    print("Simulation complete, redirecting...")
+    
     return redirect(url_for('distribution'))
+
 
 @app.route('/distribution')
 def distribution():
@@ -31,12 +36,10 @@ def distribution():
     db2 = client["node2_db"]["data"]
     db3 = client["node3_db"]["data"]
 
-    # Get the count of documents in each node
     node1_count = db1.count_documents({})
     node2_count = db2.count_documents({})
     node3_count = db3.count_documents({})
 
-    # Pass the counts to the template
     return render_template('distribution.html', node1=node1_count, node2=node2_count, node3=node3_count)
 
 if __name__ == "__main__":
