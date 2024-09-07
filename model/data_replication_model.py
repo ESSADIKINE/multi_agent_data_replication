@@ -1,5 +1,3 @@
-# Filename: data_replication_model.py
-
 from mesa import Model
 from mesa.time import RandomActivation
 from pymongo import MongoClient

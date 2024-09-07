@@ -35,13 +35,22 @@
             margin-bottom: 40px;
         }
 
-        .chart-left, .chart-right {
+        .chart-left {
             flex: 1;
             padding: 10px;
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            max-width: 50%;
+        }
+
+        #dataDistributionChart{
+            height: 500px !important;
+        }
+
+        .full-width {
+            width: 100%;
         }
 
         canvas {
@@ -54,6 +63,9 @@
             .charts-section {
                 flex-direction: column;
             }
+            .chart-left {
+                max-width: 100%;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -62,26 +74,24 @@
     <div class="container">
         <h1>Data Replication Dashboard</h1>
 
-        <!-- 1st Block: Data Distribution -->
+        <!-- 1st Block: Data Distribution and Replication Details -->
         <section class="charts-section">
             <div class="chart-left">
                 <h2>Data Distribution</h2>
-                <canvas id="dataDistributionChart" width="400" height="200"></canvas>
+                <canvas id="dataDistributionChart" width="300" height="150"></canvas>
             </div>
-        </section>
-
-        <!-- 2nd Block: Replication Details -->
-        <section class="charts-section">
             <div class="chart-left">
                 <h2>Replication Details</h2>
-                <canvas id="replicationDetailsChart" width="400" height="200"></canvas>
+                <canvas id="replicationDetailsChart" width="300" height="150"></canvas>
             </div>
         </section>
 
-        <!-- 3rd Block: Performance Metrics -->
-        <section class="performance-section">
-            <h2>Performance Metrics</h2>
-            <canvas id="performanceMetricsChart" width="400" height="200"></canvas>
+        <!-- 2nd Block: Performance Metrics -->
+        <section class="charts-section">
+            <div class="full-width">
+                <h2>Performance Metrics</h2>
+                <canvas id="performanceMetricsChart" width="600" height="300"></canvas>
+            </div>
         </section>
     </div>
 
@@ -95,9 +105,7 @@
                 .then(response => response.json())
                 .then(data => {
                     updatePerformanceMetricsChart(
-                        [data.cpu_usage], 
-                        [data.memory_usage], 
-                        [data.network_sent, data.network_received]
+                        [data.cpu_usage, data.memory_usage, data.network_sent, data.network_received]
                     );
                 });
 
@@ -168,8 +176,8 @@
             });
         }
 
-        // Function to update the Performance Metrics Chart
-        function updatePerformanceMetricsChart(cpu, memory, network) {
+        // Function to update the Performance Metrics Chart as a line chart
+        function updatePerformanceMetricsChart(data) {
             const ctx = document.getElementById('performanceMetricsChart').getContext('2d');
 
             // Destroy previous chart instance if it exists
@@ -177,34 +185,22 @@
                 performanceChartInstance.destroy();
             }
 
-            // Create a new chart
+            // Create a new line chart for performance metrics
             performanceChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['CPU Usage', 'Memory Usage', 'Network Sent (MB)', 'Network Received (MB)'],
                     datasets: [{
-                        label: 'CPU Usage (%)',
-                        data: cpu,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        label: 'Performance Metrics',
+                        data: data,
+                        fill: false,
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 2
-                    }, {
-                        label: 'Memory Usage (%)',
-                        data: memory,
-                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        borderWidth: 2
-                    }, {
-                        label: 'Network Sent (MB)',
-                        data: [network[0]],
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 2
-                    }, {
-                        label: 'Network Received (MB)',
-                        data: [network[1]],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.4, // Add smooth curve
                         borderWidth: 2
                     }]
                 },
@@ -213,6 +209,12 @@
                     scales: {
                         y: {
                             beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     }
                 }

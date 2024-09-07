@@ -1,11 +1,15 @@
-# Filename: app.py
-
 import sys
 import os
-import psutil  # Importing psutil for system metrics
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import psutil
+import time  # Import time to manage the 10-minute simulation
 from flask import Flask, render_template, jsonify, redirect, url_for
 from model.data_replication_model import DataReplicationModel
 from pymongo import MongoClient
+
+# Add the parent directory to sys.path so Python can find 'model'
 
 app = Flask(__name__)
 
@@ -30,13 +34,19 @@ def index():
 
 @app.route('/run_simulation')
 def run_simulation():
-    print("Starting simulation...")
+    print("Starting 10-minute simulation...")
 
-    for step in range(3):
-        print(f"Running step {step + 1}")
-        model.step()
+    start_time = time.time()  # Record the start time
+    simulation_duration = 2 * 60  # 10 minutes in seconds (600 seconds)
 
-    print("Simulation complete, redirecting...")
+    # Run the simulation for 10 minutes
+    while time.time() - start_time < simulation_duration:
+        model.step()  # Execute a step in the simulation
+
+        # Optionally, you can add a delay between steps if each step happens too fast.
+        # time.sleep(1)  # Pause for 1 second between steps (optional)
+
+    print("10-minute simulation complete.")
     return redirect(url_for('distribution'))
 
 @app.route('/distribution')
@@ -55,7 +65,7 @@ def distribution():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')  # Assuming you have a 'dashboard.html' file
+    return render_template('dashboard.html')
 
 @app.route('/data_distribution')
 def data_distribution():
@@ -66,7 +76,7 @@ def data_distribution():
 @app.route('/replication_details')
 def replication_details():
     # Fetch the replication details from the model
-    data = model.replication_details
+    data = model.data_distribution
     return jsonify(data)
 
 # Real-time Performance Metrics using psutil
