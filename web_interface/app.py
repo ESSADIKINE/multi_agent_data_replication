@@ -34,20 +34,20 @@ def index():
 
 @app.route('/run_simulation')
 def run_simulation():
-    print("Starting 10-minute simulation...")
+    print("Starting 2-minute simulation...")  # Adjusted to 2-minute simulation
 
     start_time = time.time()  # Record the start time
-    simulation_duration = 2 * 60  # 10 minutes in seconds (600 seconds)
+    simulation_duration = 2 * 60  # 2 minutes in seconds (120 seconds)
 
-    # Run the simulation for 10 minutes
+    # Run the simulation for 2 minutes
     while time.time() - start_time < simulation_duration:
         model.step()  # Execute a step in the simulation
+        
+        time.sleep(1)  # Optional: Pause for 1 second between steps to reduce CPU usage
 
-        # Optionally, you can add a delay between steps if each step happens too fast.
-        # time.sleep(1)  # Pause for 1 second between steps (optional)
-
-    print("10-minute simulation complete.")
+    print("2-minute simulation complete.")
     return redirect(url_for('distribution'))
+
 
 @app.route('/distribution')
 def distribution():

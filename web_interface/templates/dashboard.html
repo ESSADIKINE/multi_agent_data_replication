@@ -28,6 +28,7 @@
             margin-bottom: 20px;
         }
 
+        /* Layout: Left column for Replication Details and right column for two charts */
         .charts-section {
             display: flex;
             justify-content: space-between;
@@ -35,22 +36,24 @@
             margin-bottom: 40px;
         }
 
+        /* Left column: Replication Details */
         .chart-left {
             flex: 1;
+            max-width: 50%; /* Ensure it takes 50% of the container */
             padding: 10px;
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            max-width: 50%;
         }
 
-        #dataDistributionChart{
-            height: 500px !important;
-        }
-
-        .full-width {
-            width: 100%;
+        /* Right column with stacked charts */
+        .chart-right {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            max-width: 50%; /* Ensure it takes 50% of the container */
+            gap: 20px; /* Space between the two charts */
         }
 
         canvas {
@@ -63,7 +66,7 @@
             .charts-section {
                 flex-direction: column;
             }
-            .chart-left {
+            .chart-left, .chart-right {
                 max-width: 100%;
             }
         }
@@ -74,23 +77,24 @@
     <div class="container">
         <h1>Data Replication Dashboard</h1>
 
-        <!-- 1st Block: Data Distribution and Replication Details -->
+        <!-- 1st Block: Replication Details (Left) and Data Distribution + Performance Metrics (Right) -->
         <section class="charts-section">
-            <div class="chart-left">
-                <h2>Data Distribution</h2>
-                <canvas id="dataDistributionChart" width="300" height="150"></canvas>
-            </div>
+            <!-- Replication Details on the left -->
             <div class="chart-left">
                 <h2>Replication Details</h2>
                 <canvas id="replicationDetailsChart" width="300" height="150"></canvas>
             </div>
-        </section>
 
-        <!-- 2nd Block: Performance Metrics -->
-        <section class="charts-section">
-            <div class="full-width">
-                <h2>Performance Metrics</h2>
-                <canvas id="performanceMetricsChart" width="600" height="300"></canvas>
+            <!-- Right side with Data Distribution and Performance Metrics stacked -->
+            <div class="chart-right">
+                <div class="chart-right-item">
+                    <h2>Data Distribution</h2>
+                    <canvas id="dataDistributionChart" width="300" height="150"></canvas>
+                </div>
+                <div class="chart-right-item">
+                    <h2>Performance Metrics</h2>
+                    <canvas id="performanceMetricsChart" width="600" height="300"></canvas>
+                </div>
             </div>
         </section>
     </div>
