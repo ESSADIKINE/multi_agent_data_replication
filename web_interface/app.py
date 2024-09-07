@@ -1,7 +1,9 @@
 import sys
 import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+import psutil  # Importing psutil for system metrics
 from flask import Flask, render_template, jsonify, redirect, url_for
 from model.data_replication_model import DataReplicationModel
 from pymongo import MongoClient
@@ -56,12 +58,44 @@ def distribution():
 def dashboard():
     return render_template('dashboard.html')  # Assuming you have a 'dashboard.html' file
 
+@app.route('/data_distribution')
+def data_distribution():
+    # Example of real data distribution logic here (replace with your logic)
+    data = {
+        "node1": 120,
+        "node2": 90,
+        "node3": 150
+    }
+    return jsonify(data)
+
+# Simulated data for Replication Details
+@app.route('/replication_details')
+def replication_details():
+    # Simulate replication details (replace with your logic)
+    data = {
+        "node1": 15,  # Number of replicas for Node 1
+        "node2": 12,  # Number of replicas for Node 2
+        "node3": 20   # Number of replicas for Node 3
+    }
+    return jsonify(data)
+
+# Real-time Performance Metrics using psutil
 @app.route('/metrics')
 def get_metrics():
-    metrics_data = list(model.metrics_collection.find())
+    # Get real-time system metrics using psutil
+    cpu_usage = psutil.cpu_percent(interval=1)  # CPU usage in percentage
+    memory_info = psutil.virtual_memory()  # Memory info
+    net_io = psutil.net_io_counters()  # Network input/output statistics
+
+    # Prepare the data to return as JSON
+    metrics_data = {
+        "cpu_usage": cpu_usage,
+        "memory_usage": memory_info.percent,  # Memory usage in percentage
+        "network_sent": net_io.bytes_sent / (1024 * 1024),  # Convert to MB
+        "network_received": net_io.bytes_recv / (1024 * 1024)  # Convert to MB
+    }
+
     return jsonify(metrics_data)
-
-
 
 if __name__ == "__main__":
     delete_databases()  # Delete the databases before starting the Flask app

@@ -5,101 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Replication Dashboard</title>
     <style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
 
-.container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-    max-width: 1200px;
-}
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 1200px;
+        }
 
-/* General styling for sections */
-h1, h2 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 20px;
-}
+        h1, h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-/* 1st block: table styling */
-.table-section {
-    margin-bottom: 40px;
-}
+        .charts-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 20px;
-}
+        .chart-left, .chart-right {
+            flex: 1;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-    background-color: #f9f9f9;
-}
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
 
-th {
-    background-color: #4CAF50;
-    color: white;
-}
-
-/* 2nd block: charts section (2-column layout) */
-.charts-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;  /* Ensure both left and right sections are the same height */
-    gap: 20px;
-    margin-bottom: 40px;
-}
-
-.chart-left, .chart-right {
-    flex: 1;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-
-canvas {
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
-
-#dataDistributionChart{
-    width: 100%;
-    height: 400px !important;
-}
-
-/* 3rd block: performance section */
-.performance-section {
-    margin-bottom: 40px;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .charts-section {
-        flex-direction: column;
-    }
-
-    table, th, td {
-        font-size: 0.875rem;
-    }
-
-    button {
-        font-size: 0.875rem;
-        padding: 8px 15px;
-    }
-}
+        @media (max-width: 768px) {
+            .charts-section {
+                flex-direction: column;
+            }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -107,38 +61,19 @@ canvas {
     <div class="container">
         <h1>Data Replication Dashboard</h1>
 
-        <!-- 1st Block: Table Section -->
-        <section class="table-section">
-            <h2>Node Status</h2>
-            <table>
-                <tr>
-                    <th>Node</th>
-                    <th>Status</th>
-                </tr>
-                <tr>
-                    <td>Node 1</td>
-                    <td id="node1-status">Loading...</td>
-                </tr>
-                <tr>
-                    <td>Node 2</td>
-                    <td id="node2-status">Loading...</td>
-                </tr>
-                <tr>
-                    <td>Node 3</td>
-                    <td id="node3-status">Loading...</td>
-                </tr>
-            </table>
+        <!-- 1st Block: Data Distribution -->
+        <section class="charts-section">
+            <div class="chart-left">
+                <h2>Data Distribution</h2>
+                <canvas id="dataDistributionChart" width="400" height="200"></canvas>
+            </div>
         </section>
 
-        <!-- 2nd Block: Replication Details and Data Distribution -->
+        <!-- 2nd Block: Replication Details -->
         <section class="charts-section">
             <div class="chart-left">
                 <h2>Replication Details</h2>
                 <canvas id="replicationDetailsChart" width="400" height="200"></canvas>
-            </div>
-            <div class="chart-right">
-                <h2>Data Distribution</h2>
-                <canvas id="dataDistributionChart" width="400"></canvas>
             </div>
         </section>
 
@@ -150,16 +85,46 @@ canvas {
     </div>
 
     <script>
-        window.onload = function() {
-            // Data Distribution Chart
-            var ctx1 = document.getElementById('dataDistributionChart').getContext('2d');
-            var dataDistributionChart = new Chart(ctx1, {
+        let performanceChartInstance;  // Declare chart instance globally
+
+        // Function to fetch metrics and update the chart
+        function fetchData() {
+            // Fetch Performance Metrics
+            fetch('/metrics')
+                .then(response => response.json())
+                .then(data => {
+                    updatePerformanceMetricsChart(
+                        [data.cpu_usage], 
+                        [data.memory_usage], 
+                        [data.network_sent, data.network_received]
+                    );
+                });
+
+            // Fetch Data Distribution
+            fetch('/data_distribution')
+                .then(response => response.json())
+                .then(data => {
+                    updateDataDistributionChart([data.node1, data.node2, data.node3]);
+                });
+
+            // Fetch Replication Details
+            fetch('/replication_details')
+                .then(response => response.json())
+                .then(data => {
+                    updateReplicationDetailsChart([data.node1, data.node2, data.node3]);
+                });
+        }
+
+        // Function to update the Data Distribution Chart
+        function updateDataDistributionChart(data) {
+            const ctx = document.getElementById('dataDistributionChart').getContext('2d');
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: ['Node 1', 'Node 2', 'Node 3'],
                     datasets: [{
                         label: 'Data Count',
-                        data: [30, 50, 70],
+                        data: data,
                         backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
                         borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
                         borderWidth: 1
@@ -174,16 +139,18 @@ canvas {
                     }
                 }
             });
+        }
 
-            // Replication Details Chart
-            var ctx2 = document.getElementById('replicationDetailsChart').getContext('2d');
-            var replicationDetailsChart = new Chart(ctx2, {
+        // Function to update the Replication Details Chart
+        function updateReplicationDetailsChart(data) {
+            const ctx = document.getElementById('replicationDetailsChart').getContext('2d');
+            new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Node 1', 'Node 2', 'Node 3'],
                     datasets: [{
                         label: 'Replicas Count',
-                        data: [12, 15, 18],
+                        data: data,
                         backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
                         borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
                         borderWidth: 1
@@ -198,30 +165,45 @@ canvas {
                     }
                 }
             });
+        }
 
-            // Performance Metrics Chart
-            var ctx3 = document.getElementById('performanceMetricsChart').getContext('2d');
-            var performanceMetricsChart = new Chart(ctx3, {
+        // Function to update the Performance Metrics Chart
+        function updatePerformanceMetricsChart(cpu, memory, network) {
+            const ctx = document.getElementById('performanceMetricsChart').getContext('2d');
+
+            // Destroy previous chart instance if it exists
+            if (performanceChartInstance) {
+                performanceChartInstance.destroy();
+            }
+
+            // Create a new chart
+            performanceChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'],
+                    labels: ['CPU Usage', 'Memory Usage', 'Network Sent (MB)', 'Network Received (MB)'],
                     datasets: [{
                         label: 'CPU Usage (%)',
-                        data: [45, 60, 55, 70],
+                        data: cpu,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 2
                     }, {
                         label: 'Memory Usage (%)',
-                        data: [40, 50, 60, 80],
+                        data: memory,
                         backgroundColor: 'rgba(255, 206, 86, 0.2)',
                         borderColor: 'rgba(255, 206, 86, 1)',
                         borderWidth: 2
                     }, {
-                        label: 'Network Load (%)',
-                        data: [30, 50, 40, 60],
+                        label: 'Network Sent (MB)',
+                        data: [network[0]],
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Network Received (MB)',
+                        data: [network[1]],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 2
                     }]
                 },
@@ -234,7 +216,11 @@ canvas {
                     }
                 }
             });
-        };
+        }
+
+        // Fetch data every 5 seconds
+        setInterval(fetchData, 5000);
+        window.onload = fetchData;
     </script>
 </body>
 </html>
