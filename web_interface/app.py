@@ -1,8 +1,7 @@
+# Filename: app.py
+
 import sys
 import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import psutil  # Importing psutil for system metrics
 from flask import Flask, render_template, jsonify, redirect, url_for
 from model.data_replication_model import DataReplicationModel
@@ -60,23 +59,14 @@ def dashboard():
 
 @app.route('/data_distribution')
 def data_distribution():
-    # Example of real data distribution logic here (replace with your logic)
-    data = {
-        "node1": 120,
-        "node2": 90,
-        "node3": 150
-    }
+    # Fetch the data distribution from the model
+    data = model.data_distribution
     return jsonify(data)
 
-# Simulated data for Replication Details
 @app.route('/replication_details')
 def replication_details():
-    # Simulate replication details (replace with your logic)
-    data = {
-        "node1": 15,  # Number of replicas for Node 1
-        "node2": 12,  # Number of replicas for Node 2
-        "node3": 20   # Number of replicas for Node 3
-    }
+    # Fetch the replication details from the model
+    data = model.replication_details
     return jsonify(data)
 
 # Real-time Performance Metrics using psutil
