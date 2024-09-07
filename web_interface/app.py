@@ -37,7 +37,7 @@ def run_simulation():
     print("Starting 2-minute simulation...")  # Adjusted to 2-minute simulation
 
     start_time = time.time()  # Record the start time
-    simulation_duration = 2 * 60  # 2 minutes in seconds (120 seconds)
+    simulation_duration = 20  # 2 minutes in seconds (120 seconds)
 
     # Run the simulation for 2 minutes
     while time.time() - start_time < simulation_duration:
