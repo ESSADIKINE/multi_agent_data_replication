@@ -3,3 +3,4 @@ pymongo==4.5.0
 mesa==0.9.1
 pandas==2.0.3
 numpy==1.25.1
+psutil
